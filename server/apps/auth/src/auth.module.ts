@@ -1,19 +1,12 @@
 import { Module } from '@nestjs/common';
+import { PassportModule } from '@nestjs/passport';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { ClientsModule, Transport } from '@nestjs/microservices';
 
 @Module({
-  imports: [
-    ClientsModule.register([
-      {
-        name: 'USERS_CLIENT',
-        transport: Transport.TCP,
-        options: { port: 3001 },
-      },
-    ]),
-  ],
+  imports: [PassportModule.register({defaultStrategy:'keycloak'})],
   controllers: [AuthController],
   providers: [AuthService],
+  exports:[PassportModule]
 })
 export class AuthModule {}
