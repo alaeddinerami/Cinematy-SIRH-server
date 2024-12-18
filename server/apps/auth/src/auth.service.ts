@@ -14,7 +14,7 @@ interface AuthResponse {
 export class AuthService {
 
   private keycloakUrl = 'http://localhost:8080/realms/mjtech/protocol/openid-connect/token';
-  private clientId = 'public-client';
+  private clientId = 'confidential-client';
   private scope = 'email openid' 
 
 
@@ -26,8 +26,9 @@ export class AuthService {
       const response = await axios.post<AuthResponse>(
         this.keycloakUrl,
         new URLSearchParams({
-          grant_type: 'password',
+          grant_type: 'client_credentials',
           client_id: this.clientId,
+          client_secret: 'xaSIHJWbz3norMJ2L2FcD1inLf17LbZZ',
           scope: this.scope,
           username,
           password,
@@ -62,12 +63,12 @@ export class AuthService {
     }
   }
 
-  async register(data): Promise<any> {
-    const { username, email, password } = data;
+  async register({ username, email, password }): Promise<any> {
 
     try {
       const adminToken = await this.getAdminToken();
   
+
       const response = await axios.post(
         `http://localhost:8080/admin/realms/mjtech/users`,
         {
@@ -92,16 +93,11 @@ export class AuthService {
       return {
         message: 'User registered successfully!',
         statusCode: 201,
-        user: {
-          username,
-          email,
-        },
       };
     } catch (error) {
       console.error('Registration error:', error.response?.data);
       throw new HttpException('Registration failed', 500);
     }
   }
-
   
 }
